@@ -12,15 +12,15 @@ room('corridor',{ch:2,name:'B2 복도',bg:'corridor',tint:'linear-gradient(180de
   onEnter:p=>{if(!F().corridorSeen){F().corridorSeen=true;sys('문이 뒤에서 닫힌다. 복도는 길고, 비상등 두 개만 켜져 있다. 멀리서 삐— 삐— 경보음.');
     say('여기가 복도야. 저 경보는 기계실. 냉각 쪽이 이상해. 그리고… 어두우니까 뭐라도 찾아서 들고 다녀.');}},
   hots:[
-   {id:'hydrant',icon:'🧯',label:'소화전함',x:12,y:50,open:()=>{if(hasInv('손전등')){modal('소화전함',`<p>소화기와 호스. 손전등은 이미 꺼냈다.</p>`);return;}
+   {id:'hydrant',icon:'🧯',label:'소화전함',x:33,y:58,open:()=>{if(hasInv('손전등')){modal('소화전함',`<p>소화기와 호스. 손전등은 이미 꺼냈다.</p>`);return;}
      addInv('손전등');modal('소화전함',`<p>소화기, 호스, 그리고 비상용 손전등. 스위치를 눌러 본다.</p><p><b>안 켜진다.</b> 배터리 칸이 비어 있다.</p>`);}},
-   {id:'map',icon:'🗺️',label:'소화 안내도',x:28,y:30,open:()=>{F().mapSeen=true;render();modal('B2 소화 안내도',`<div class="doc"><h4>지하 2층 평면도</h4><table><tr><th>번호</th><th>구역</th><th>비고</th></tr><tr><td>0</td><td>서버룸 / 코어</td><td>할론 소화</td></tr><tr><td>1</td><td>기계실</td><td>냉각·배전 2차</td></tr><tr><td>2</td><td>창고</td><td>비품</td></tr><tr><td>—</td><td>엘리베이터</td><td>복도 서쪽 끝</td></tr><tr><td>—</td><td>비상계단</td><td>복도 동쪽 끝 · 카드키</td></tr></table><p style="font-size:12px;color:#666">현 위치: 복도 중앙. 창고는 기계실 맞은편.</p></div>`);}},
-   {id:'machine',icon:'🚪',label:'기계실 (1번)',x:46,y:58,door:true,open:()=>go('machine')},
-   {id:'storage',icon:'🔒',label:()=>F().storageOpen?'창고 (2번)':'창고 (2번) · 자물쇠',x:62,y:58,door:true,show:()=>F().mapSeen||hasLight(),open:openStorageLock},
-   {id:'board',icon:'📌',label:'게시판',x:78,y:28,show:hasLight,open:()=>modal('게시판',`<div class="note">보안팀 전달사항<br>· 비상 무전 채널 = <b>부서코드 × 입사연도 뒷자리</b>. 외우지 말고 계산할 것. (본인 기준)<br>· 야간에는 계단문 카드 리더가 잠김. 엘리베이터 사용.<br><span style="font-size:12px">— 박서연</span></div><p class="dim">그 아래 작은 메모 하나. "도윤아 밥은 먹고 다니냐" — 누가 썼는지는 안 적혀 있다.</p>`)},
-   {id:'elev',icon:'🛗',label:()=>F().powerDist?'엘리베이터':'엘리베이터 (전원 없음)',x:6,y:60,door:true,show:hasLight,open:openElevatorB2},
-   {id:'stairs',icon:'🚪',label:'비상계단 (카드)',x:94,y:58,show:hasLight,open:()=>{modal('비상계단문',`<p>카드 리더에 사원증을 댄다. <b style="color:var(--warn)">야간 모드 — 거부</b>.</p><p class="dim">게시판 말대로다. 엘리베이터뿐이다.</p>`);bad();}},
-   {id:'back',icon:'↩',label:'서버룸으로',x:34,y:88,door:true,open:()=>go('core')},
+   {id:'map',icon:'🗺️',label:'소화 안내도',x:35,y:42,open:()=>{F().mapSeen=true;render();modal('B2 소화 안내도',`<div class="doc"><h4>지하 2층 평면도</h4><table><tr><th>번호</th><th>구역</th><th>비고</th></tr><tr><td>0</td><td>서버룸 / 코어</td><td>할론 소화</td></tr><tr><td>1</td><td>기계실</td><td>냉각·배전 2차</td></tr><tr><td>2</td><td>창고</td><td>비품</td></tr><tr><td>—</td><td>엘리베이터</td><td>복도 서쪽 끝</td></tr><tr><td>—</td><td>비상계단</td><td>복도 동쪽 끝 · 카드키</td></tr></table><p style="font-size:12px;color:#666">현 위치: 복도 중앙. 창고는 기계실 맞은편.</p></div>`);}},
+   {id:'machine',icon:'🚪',label:'기계실 (1번)',x:44,y:55,door:true,open:()=>go('machine')},
+   {id:'storage',icon:'🔒',label:()=>F().storageOpen?'창고 (2번)':'창고 (2번) · 자물쇠',x:60,y:55,door:true,show:()=>F().mapSeen||hasLight(),open:openStorageLock},
+   {id:'board',icon:'📌',label:'게시판',x:76,y:43,show:hasLight,open:()=>modal('게시판',`<div class="note">보안팀 전달사항<br>· 비상 무전 채널 = <b>부서코드 × 입사연도 뒷자리</b>. 외우지 말고 계산할 것. (본인 기준)<br>· 야간에는 계단문 카드 리더가 잠김. 엘리베이터 사용.<br><span style="font-size:12px">— 박서연</span></div><p class="dim">그 아래 작은 메모 하나. "도윤아 밥은 먹고 다니냐" — 누가 썼는지는 안 적혀 있다.</p>`)},
+   {id:'elev',icon:'🛗',label:()=>F().powerDist?'엘리베이터':'엘리베이터 (전원 없음)',x:12,y:45,door:true,show:hasLight,open:openElevatorB2},
+   {id:'stairs',icon:'🚪',label:'비상계단 (카드)',x:89,y:52,show:hasLight,open:()=>{modal('비상계단문',`<p>카드 리더에 사원증을 댄다. <b style="color:var(--warn)">야간 모드 — 거부</b>.</p><p class="dim">게시판 말대로다. 엘리베이터뿐이다.</p>`);bad();}},
+   {id:'back',icon:'↩',label:'서버룸으로',x:50,y:93,door:true,open:()=>go('core')},
   ]});
 
 function openStorageLock(){if(F().storageOpen){go('storage');return;}
@@ -38,11 +38,11 @@ room('storage',{ch:2,name:'B2 창고',bg:'storage',tint:'linear-gradient(180deg,
   look:'철제 선반에 비품 상자. 먼지 냄새. 입구 옆에 전등 스위치가 있지만 복도 전원과 같이 죽어 있다.',
   hints:['선반을 뒤져 봐.'],
   hots:[
-   {id:'shelf',icon:'📦',label:'선반',x:40,y:50,glow:true,open:()=>{if(F().shelfDone){modal('선반',`<p>남은 건 빈 상자뿐이다.</p>`);return;}
+   {id:'shelf',icon:'📦',label:'선반',x:39,y:73,glow:true,open:()=>{if(F().shelfDone){modal('선반',`<p>남은 건 빈 상자뿐이다.</p>`);return;}
      F().shelfDone=true;F().lightOn=true;addInv('무전기');addInv('테이프');S.inv=S.inv.filter(i=>i!=='손전등');addInv('손전등');
      modal('선반',`<p>상자를 뒤진다. AA 건전지 한 묶음, 휴대용 무전기, 박스 테이프, 케이블 타이.</p><p>손전등에 건전지를 넣는다. <b class="ok">켜진다.</b></p><p class="dim">무전기는 소지품에서 눌러 쓸 수 있다.</p>`);
      sys('복도가 보이기 시작한다.');say('좋아. 이제 기계실로. 경보가 계속 울리고 있어. 오래 두면 안 돼.');render();save();}},
-   {id:'back',icon:'↩',label:'복도로',x:50,y:88,door:true,open:()=>go('corridor')},
+   {id:'back',icon:'↩',label:'복도로',x:85,y:88,door:true,open:()=>go('corridor')},
   ]});
 
 // ---------- 무전기 ----------
@@ -71,14 +71,14 @@ room('machine',{ch:2,name:'B2 기계실',bg:'machine',tint:'linear-gradient(180d
   onEnter:()=>{if(!F().machineSeen){F().machineSeen=true;setDeadline('valve',15*60);sys('경보음이 귀를 찌른다. 벽의 가스 경보기가 빨갛게 깜빡인다.');
     say('냉각수 누출이야. 압력을 못 맞추면 15분 뒤에 코어가 녹아. 이번엔 진짜야. 밸브는 펌프 옆에.');}},
   hots:[
-   {id:'valve',icon:'🔧',label:'냉각 밸브반',x:30,y:55,glow:true,open:openValves},
-   {id:'pipe',icon:'📐',label:'배관도',x:18,y:28,open:()=>modal('냉각 배관도',`<div class="doc"><h4>냉각 계통 — 밸브별 영향 (1단당)</h4><table><tr><th>밸브</th><th>P1</th><th>P2</th><th>P3</th></tr><tr><td>A</td><td>+2</td><td>+1</td><td>—</td></tr><tr><td>B</td><td>—</td><td>+1</td><td>+2</td></tr><tr><td>C</td><td><b>−1</b></td><td>—</td><td>+1</td></tr></table><p>정상 운전: 세 게이지 모두 <b>녹색 구간(3)</b>.</p><p style="font-size:12px;color:#666">밸브 단수 0~3.</p></div>`)},
-   {id:'gas',icon:'🚨',label:'가스 경보기',x:50,y:20,open:()=>{const l=deadlineLeft('valve');modal('가스 경보기',`<p>${F().valveDone?'초록 불. 조용하다.':`빨간 불이 깜빡인다. 표시창: <b class="mono">COOLANT LEAK — ${l!==null?fmt(l):'--:--'}</b>`}</p>`);}},
-   {id:'floorm',icon:'🪢',label:'바닥의 끈',x:62,y:84,show:()=>F().valveDone,open:()=>{modal('바닥',`<p>펌프 옆 바닥에 사원증 목걸이 끈이 떨어져 있다. 끊어져 있다. 넥서스랩 로고.</p><p>당신 사원증에는 끈이 없었다.</p>`);
+   {id:'valve',icon:'🔧',label:'냉각 밸브반',x:36,y:56,glow:true,open:openValves},
+   {id:'pipe',icon:'📐',label:'배관도',x:12,y:31,open:()=>modal('냉각 배관도',`<div class="doc"><h4>냉각 계통 — 밸브별 영향 (1단당)</h4><table><tr><th>밸브</th><th>P1</th><th>P2</th><th>P3</th></tr><tr><td>A</td><td>+2</td><td>+1</td><td>—</td></tr><tr><td>B</td><td>—</td><td>+1</td><td>+2</td></tr><tr><td>C</td><td><b>−1</b></td><td>—</td><td>+1</td></tr></table><p>정상 운전: 세 게이지 모두 <b>녹색 구간(3)</b>.</p><p style="font-size:12px;color:#666">밸브 단수 0~3.</p></div>`)},
+   {id:'gas',icon:'🚨',label:'가스 경보기',x:55,y:31,open:()=>{const l=deadlineLeft('valve');modal('가스 경보기',`<p>${F().valveDone?'초록 불. 조용하다.':`빨간 불이 깜빡인다. 표시창: <b class="mono">COOLANT LEAK — ${l!==null?fmt(l):'--:--'}</b>`}</p>`);}},
+   {id:'floorm',icon:'🪢',label:'바닥의 끈',x:51,y:88,show:()=>F().valveDone,open:()=>{modal('바닥',`<p>펌프 옆 바닥에 사원증 목걸이 끈이 떨어져 있다. 끊어져 있다. 넥서스랩 로고.</p><p>당신 사원증에는 끈이 없었다.</p>`);
      if(!S.frags[3]){frag(3,'기계실 바닥. 끊어진 사원증 끈.');say('…기억나? 당신, 여기서 쓰러져 있었어. 가스 때문에. 내가 환기를 돌렸고, 코어 방으로… 아니. 이 얘긴 나중에.');}}},
-   {id:'manual',icon:'📘',label:'매뉴얼',x:80,y:30,open:()=>modal('설비 매뉴얼',`<div class="doc"><h4>엘리베이터 EL-1</h4><p>기동 전력: <b>25 이상</b> (배전 2차 기준)</p><h4>냉각 펌프</h4><p>냉각 전력 <b>40 미만</b> 시 경보 및 자동 정지.</p></div>`)},
-   {id:'power2',icon:'⚡',label:'배전 2차반',x:84,y:58,glow:true,open:openPowerDist},
-   {id:'back',icon:'↩',label:'복도로',x:50,y:90,door:true,open:()=>go('corridor')},
+   {id:'manual',icon:'📘',label:'매뉴얼',x:73,y:22,open:()=>modal('설비 매뉴얼',`<div class="doc"><h4>엘리베이터 EL-1</h4><p>기동 전력: <b>25 이상</b> (배전 2차 기준)</p><h4>냉각 펌프</h4><p>냉각 전력 <b>40 미만</b> 시 경보 및 자동 정지.</p></div>`)},
+   {id:'power2',icon:'⚡',label:'배전 2차반',x:90,y:52,glow:true,open:openPowerDist},
+   {id:'back',icon:'↩',label:'복도로',x:20,y:93,door:true,open:()=>go('corridor')},
   ]});
 
 DEADLINE.valve=()=>{if(F().valveDone)return;F().valveDone=true;F().valveAuto=true;trustUp();alarm(2);

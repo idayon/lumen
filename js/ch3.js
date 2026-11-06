@@ -9,14 +9,14 @@ room('security',{ch:3,name:'B1 보안실',bg:'security',tint:'linear-gradient(18
     if(!F().secSeen){F().secSeen=true;sys('엘리베이터 문이 열린다. 모니터 아홉 개가 푸르게 방을 비춘다.');
       say('보안실이야. 저 CCTV 벽, 당신이 늘… 보안팀이 늘 보던 거야. 금고에 계단 열쇠가 있을 거야.');}},
   hots:[
-   {id:'cctv',icon:'📺',label:'CCTV 모니터 벽',x:50,y:30,glow:true,open:openCCTV},
-   {id:'memo',icon:'📝',label:'책상 메모',x:30,y:62,open:()=>modal('책상 메모',`<div class="note">4/15 22:00 대표님 B2 입장. 녹화 삭제 요청 받음.<br><b>안 함.</b><br><span style="font-size:12px">— 서연</span></div>`)},
-   {id:'board',icon:'🗓️',label:'근무표',x:12,y:30,open:()=>modal('근무표 (화이트보드)',`<div class="doc"><h4>4월 야간 당직</h4><table><tr><td>4/15</td><td>이준호</td></tr><tr><td>4/16</td><td>박서연</td></tr><tr><td>4/17</td><td><b>박서연</b> (교대 <b>23:30</b> · 외부 업체 입회)</td></tr></table><p style="font-size:12px;color:#666">김도윤 — 줄이 그어져 있다.</p></div>`)},
-   {id:'safe',icon:'🔐',label:'금고',x:12,y:70,open:openSecSafe},
-   {id:'desks',icon:'🪪',label:'책상 명패',x:68,y:62,open:()=>modal('책상 셋',`<p>박서연 — 수첩 자리만 비어 있다. 이준호 — 정리정돈. 김도윤 — <b>서랍이 전부 비어 있다.</b> 누가 급히 치운 듯.</p><p class="dim">${F().identity?'당신 자리다. 의자 높이가 몸에 맞는다.':'의자에 앉아 본다. 높이가 몸에 딱 맞는다. 우연이겠지.'}</p>`)},
-   {id:'archive',icon:'🚪',label:'아카이브 (철문)',x:88,y:40,door:true,open:()=>{if(!hasInv('아카이브 열쇠')){modal('아카이브 철문',`<p>잠겨 있다. 열쇠 구멍 위에 "ARCHIVE".</p>`);bad();return;}go('archive');}},
-   {id:'elev',icon:'🛗',label:'엘리베이터',x:6,y:50,door:true,open:openElevatorB1},
-   {id:'stairs',icon:'🚪',label:'비상계단 (열쇠)',x:94,y:70,door:true,open:()=>{if(!hasInv('비상계단 열쇠')){modal('비상계단문',`<p>잠겨 있다. 카드 리더는 없고 열쇠 구멍뿐.</p>`);bad();return;}go('stairs_b1');}},
+   {id:'cctv',icon:'📺',label:'CCTV 모니터 벽',x:45,y:22,glow:true,open:openCCTV},
+   {id:'memo',icon:'📝',label:'책상 메모',x:41,y:55,open:()=>modal('책상 메모',`<div class="note">4/15 22:00 대표님 B2 입장. 녹화 삭제 요청 받음.<br><b>안 함.</b><br><span style="font-size:12px">— 서연</span></div>`)},
+   {id:'board',icon:'🗓️',label:'근무표',x:19,y:38,open:()=>modal('근무표 (화이트보드)',`<div class="doc"><h4>4월 야간 당직</h4><table><tr><td>4/15</td><td>이준호</td></tr><tr><td>4/16</td><td>박서연</td></tr><tr><td>4/17</td><td><b>박서연</b> (교대 <b>23:30</b> · 외부 업체 입회)</td></tr></table><p style="font-size:12px;color:#666">김도윤 — 줄이 그어져 있다.</p></div>`)},
+   {id:'safe',icon:'🔐',label:'금고',x:16,y:73,open:openSecSafe},
+   {id:'desks',icon:'🪪',label:'책상 명패',x:58,y:60,open:()=>modal('책상 셋',`<p>박서연 — 수첩 자리만 비어 있다. 이준호 — 정리정돈. 김도윤 — <b>서랍이 전부 비어 있다.</b> 누가 급히 치운 듯.</p><p class="dim">${F().identity?'당신 자리다. 의자 높이가 몸에 맞는다.':'의자에 앉아 본다. 높이가 몸에 딱 맞는다. 우연이겠지.'}</p>`)},
+   {id:'archive',icon:'🚪',label:'아카이브 (철문)',x:76,y:43,door:true,open:()=>{if(!hasInv('아카이브 열쇠')){modal('아카이브 철문',`<p>잠겨 있다. 열쇠 구멍 위에 "ARCHIVE".</p>`);bad();return;}go('archive');}},
+   {id:'elev',icon:'🛗',label:'엘리베이터',x:4,y:45,door:true,open:openElevatorB1},
+   {id:'stairs',icon:'🚪',label:'비상계단 (열쇠)',x:94,y:46,door:true,open:()=>{if(!hasInv('비상계단 열쇠')){modal('비상계단문',`<p>잠겨 있다. 카드 리더는 없고 열쇠 구멍뿐.</p>`);bad();return;}go('stairs_b1');}},
   ]});
 
 function openCCTV(){const opt=(a,b,sel)=>{let s='';for(let i=a;i<=b;i++)s+=`<option ${i===sel?'selected':''}>${String(i).padStart(2,'0')}</option>`;return s;};
@@ -53,9 +53,9 @@ room('archive',{ch:3,name:'B1 아카이브',bg:'archive',tint:'linear-gradient(1
   hints:['7번과 3번 칸. 두 장부를 나란히 펼쳐 봐.','숫자가 다른 칸을 내부본에서 눌러. 다섯 군데야.'],
   onEnter:()=>{if(S.flags.mute){S.flags.mute=false;say('…미안. 잠깐 말을 못 하겠더라.');}},
   hots:[
-   {id:'cab',icon:'🗄️',label:'서류함',x:40,y:45,glow:true,open:openCabinets},
-   {id:'term',icon:'🚪',label:'단말실',x:84,y:40,door:true,open:()=>go('terminal')},
-   {id:'back',icon:'↩',label:'보안실로',x:12,y:85,door:true,open:()=>go('security')},
+   {id:'cab',icon:'🗄️',label:'서류함',x:38,y:60,glow:true,open:openCabinets},
+   {id:'term',icon:'🚪',label:'단말실',x:78,y:55,door:true,open:()=>go('terminal')},
+   {id:'back',icon:'↩',label:'보안실로',x:9,y:52,door:true,open:()=>go('security')},
   ]});
 
 function openCabinets(){const lbl={1:'2019 영수증',2:'인사 기록 (잠김)',3:'결산 2023 (내부본)',4:'비품 대장',5:'빈 칸',6:'계약서 철',7:'결산 2023 (제출본)',8:'보안 일지 2024',9:'빈 칸'};
@@ -93,8 +93,8 @@ room('terminal',{ch:3,name:'루멘 단말실',bg:'terminal',tint:'radial-gradien
   hints:['조각 세 개가 문장 하나야. 문장의 시작은 주어로.'],
   onEnter:()=>{if(!F().termSeen){F().termSeen=true;say('…여기는 내 로그가 있던 곳이야. 지워졌지만. 복원하든 말든 당신 마음대로 해.');}},
   hots:[
-   {id:'console',icon:'🖥️',label:'복원 단말',x:50,y:48,glow:true,open:openLogRestore},
-   {id:'back',icon:'↩',label:'아카이브로',x:14,y:85,door:true,open:()=>go('archive')},
+   {id:'console',icon:'🖥️',label:'복원 단말',x:50,y:43,glow:true,open:openLogRestore},
+   {id:'back',icon:'↩',label:'아카이브로',x:8,y:90,door:true,open:()=>go('archive')},
   ]});
 function openLogRestore(){if(F().logDone){modal('복원 로그',`<div class="mailbody">${LOGS.map(s=>s.join(' ')).join('\n')}</div>`);return;}
   const frags=LOGS.flat().map((t,i)=>({t,i}));for(let i=frags.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[frags[i],frags[j]]=[frags[j],frags[i]];}
@@ -117,9 +117,9 @@ async function logAfter(){await sleep(1200);sys('[음성 로그 — LUMEN, 4월 
 room('stairs_b1',{ch:3,name:'비상계단 (B1 → 1F)',bg:'stairs',tint:'linear-gradient(180deg,#121417,#08090b)',
   look:'콘크리트 계단. 벽에 포스터 한 장.',hints:['올라가.'],
   hots:[
-   {id:'poster',icon:'📄',label:'벽 포스터',x:30,y:40,open:()=>{modal('벽 포스터',`<div class="doc"><h4>내부고발자 보호 안내</h4><p>공익신고는 법으로 보호됩니다. 혼자 고민하지 마세요. 상담: 1398</p></div><p>포스터 귀퉁이에 볼펜으로.</p><div class="note">"결국 나 혼자 하는 거네 — D.Y."</div>`);
+   {id:'poster',icon:'📄',label:'벽 포스터',x:24,y:38,open:()=>{modal('벽 포스터',`<div class="doc"><h4>내부고발자 보호 안내</h4><p>공익신고는 법으로 보호됩니다. 혼자 고민하지 마세요. 상담: 1398</p></div><p>포스터 귀퉁이에 볼펜으로.</p><div class="note">"결국 나 혼자 하는 거네 — D.Y."</div>`);
      frag(6,'계단실 포스터의 메모. "결국 나 혼자 하는 거네 — D.Y."');}},
-   {id:'up',icon:'⬆',label:'1층으로',x:70,y:30,door:true,open:()=>{sys('계단을 오른다. 문 너머에서 희미한 가로등 빛.');go('lobby');}},
+   {id:'up',icon:'⬆',label:'1층으로',x:62,y:24,door:true,open:()=>{sys('계단을 오른다. 문 너머에서 희미한 가로등 빛.');go('lobby');}},
   ]});
 
 CH_START[4]=st=>{['비상계단 열쇠','아카이브 열쇠','장부 대조 코드 35819'].forEach(i=>st.inv.includes(i)||st.inv.push(i));

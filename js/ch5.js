@@ -7,10 +7,10 @@ room('roofstairs',{ch:5,name:'옥상 계단실',bg:'stairs',tint:'linear-gradien
   hints:['카드는 거부될 거야. 키패드 비밀번호는 당신이 정한 거야. 여섯 자리.','1장에서 PC에 뭘로 로그인했지?'],
   onEnter:()=>{if(!F().roofSeen){F().roofSeen=true;say('내가 열어 줄게. …아니. 당신이 열어. 비밀번호는 당신이 정한 거야. 사원증 권한을 안 지운 것도 그래서야.');}},
   hots:[
-   {id:'lock',icon:'🔐',label:'옥상 문 (이중 잠금)',x:50,y:45,glow:true,open:()=>{
+   {id:'lock',icon:'🔐',label:'옥상 문 (이중 잠금)',x:62,y:24,glow:true,open:()=>{
      keypadModal('옥상 문',6,v=>{if(v==='230202')return {ok:'OPEN',then:()=>{sys('찬 바람. 옥상이다. 통신실 문이 반쯤 열려 있다.');go('comm');}};return {err:'거부'};},
       `<p>열쇠: <span class="ok">맞는다</span> · 카드: <span class="err">퇴사자 — 거부</span> · 키패드 6자리:</p>`);}},
-   {id:'back',icon:'⬇',label:'로비로',x:14,y:85,door:true,open:()=>go('lobby')},
+   {id:'back',icon:'⬇',label:'로비로',x:88,y:88,door:true,open:()=>go('lobby')},
   ]});
 
 room('comm',{ch:5,name:'옥상 통신실',bg:'comm',tint:'radial-gradient(ellipse at 50% 30%,#0f2228,#06090c 70%)',
@@ -19,13 +19,13 @@ room('comm',{ch:5,name:'옥상 통신실',bg:'comm',tint:'radial-gradient(ellips
   onEnter:()=>{if(!F().commSeen){F().commSeen=true;sys('통신실. 모니터 하나가 B2 코어 방을 비추고 있다. 푸른 상자가 혼자 깜빡인다.');
     say('여기서 외부로 보낼 수 있어. 안테나를 맞추고, 전력을 끌어와야 해.');}},
   hots:[
-   {id:'log',icon:'📓',label:'통신 일지',x:18,y:35,open:()=>modal('통신 일지',`<div class="doc"><h4>외부 감사기관 수신 링크</h4><p>방위각 = 건물 번지수 × 3</p><p>앙각 = 지상 층수 + 10</p><p style="font-size:12px;color:#666">링크 LED 녹색이면 정렬 완료.</p></div>`)},
-   {id:'ant',icon:'📡',label:'안테나 제어반',x:40,y:55,glow:true,open:openAntenna},
-   {id:'pwr',icon:'⚡',label:'전력 통제 (원격)',x:66,y:55,open:openPower5},
-   {id:'mon',icon:'📺',label:'코어 방 모니터',x:82,y:30,open:()=>modal('모니터',`<p>B2 코어 방. 푸른 상자. ${F().transferStarted?'문 앞에 사람 둘. 장비 가방.':'아무도 없다.'}</p>`)},
-   {id:'term',icon:'🖥️',label:'위성 링크 단말',x:52,y:28,glow:true,open:openFinal},
-   {id:'ladder',icon:'🪜',label:'비상 사다리',x:92,y:70,open:()=>modal('비상 사다리',`<p>옆 건물 옥상으로 이어진다. 저쪽에 손전등 불빛 하나. 박서연이다.</p><p class="dim">${F().finalDone?'':'아직이다. 단말에서 할 일이 남았다.'}</p>`)},
-   {id:'back',icon:'⬇',label:'계단실로',x:8,y:88,door:true,open:()=>go('roofstairs')},
+   {id:'log',icon:'📓',label:'통신 일지',x:9,y:17,open:()=>modal('통신 일지',`<div class="doc"><h4>외부 감사기관 수신 링크</h4><p>방위각 = 건물 번지수 × 3</p><p>앙각 = 지상 층수 + 10</p><p style="font-size:12px;color:#666">링크 LED 녹색이면 정렬 완료.</p></div>`)},
+   {id:'ant',icon:'📡',label:'안테나 제어반',x:30,y:55,glow:true,open:openAntenna},
+   {id:'pwr',icon:'⚡',label:'전력 통제 (원격)',x:55,y:55,open:openPower5},
+   {id:'mon',icon:'📺',label:'코어 방 모니터',x:65,y:14,open:()=>modal('모니터',`<p>B2 코어 방. 푸른 상자. ${F().transferStarted?'문 앞에 사람 둘. 장비 가방.':'아무도 없다.'}</p>`)},
+   {id:'term',icon:'🖥️',label:'위성 링크 단말',x:42,y:24,glow:true,open:openFinal},
+   {id:'ladder',icon:'🪜',label:'비상 사다리',x:84,y:52,open:()=>modal('비상 사다리',`<p>옆 건물 옥상으로 이어진다. 저쪽에 손전등 불빛 하나. 박서연이다.</p><p class="dim">${F().finalDone?'':'아직이다. 단말에서 할 일이 남았다.'}</p>`)},
+   {id:'back',icon:'⬇',label:'계단실로',x:10,y:92,door:true,open:()=>go('roofstairs')},
   ]});
 
 function openAntenna(){if(F().antOk){modal('안테나 제어반',`<p>방위각 213 / 앙각 14. 링크 LED <span class="ok">녹색</span>.</p>`);return;}

@@ -7,16 +7,16 @@ room('lobby',{ch:4,name:'1F 로비',bg:'lobby',tint:'linear-gradient(180deg,#0f1
   onEnter:p=>{if(!F().lobbySeen){F().lobbySeen=true;sys('로비. 셔터 틈으로 가로등 빛이 바닥에 줄을 긋는다. 벽시계 초침 소리.');
     say('1층이야. 정문은 셔터. 통제반으로 열 수 있는데 키가 대표실에 있어. …대표실, 가 본 적 있지?');}},
   hots:[
-   {id:'deskpc',icon:'💻',label:'안내데스크 PC',x:30,y:55,glow:true,open:openVisitorLog},
-   {id:'clock',icon:'🕰️',label:'벽시계',x:50,y:18,open:()=>modal('벽시계',`<p>지금 <b class="mono" style="font-size:22px">${gameClock()}</b>.</p><p class="dim">방문자 로그의 업체 도착 예정은 23:30.</p>`)},
-   {id:'sign',icon:'🏢',label:'건물 안내판',x:68,y:30,open:()=>modal('건물 안내판',`<div class="doc"><h4>NEXUS TOWER</h4><p>서울 강남구 테헤란로 <b>71</b></p><table><tr><td>4F</td><td>임원실 · 옥상 통신실 출입</td></tr><tr><td>2~3F</td><td>사무실</td></tr><tr><td>1F</td><td>로비 · 대표실(중층)</td></tr><tr><td>B1</td><td>보안실 · 아카이브</td></tr><tr><td>B2</td><td>서버룸 · 기계실</td></tr></table><p style="font-size:12px;color:#666">지상 4층 / 지하 2층</p></div>`)},
-   {id:'logbook',icon:'📒',label:'근무일지',x:22,y:72,open:()=>modal('안내데스크 근무일지',`<div class="doc"><h4>셔터 운용</h4><p>개방 코드 = <b>오늘 날짜 네 자리</b> 뒤에 <b>당일 방문 예정 인원 수</b>.</p><p style="font-size:12px;color:#666">통제반 키는 대표실 보관.</p></div>`)},
-   {id:'ctrl',icon:'🎛️',label:'통제반',x:86,y:60,open:openControlPanel},
-   {id:'shutter',icon:'🚧',label:'정문 셔터',x:92,y:30,open:()=>modal('정문 셔터',`<p>철제 셔터. 밖에서 가로등 빛이 새어 든다.${F().vanSeen?' 승합차 한 대가 서 있다. 라이트는 꺼졌다.':''}</p>`)},
-   {id:'ceo',icon:'🪜',label:()=>F().ceoOpen?'대표실 (열림)':'대표실 계단',x:10,y:40,door:true,open:()=>F().ceoOpen?go('ceo'):openCeoDoor()},
-   {id:'pantry',icon:'🍱',label:'탕비실',x:62,y:72,door:true,open:()=>go('pantry')},
-   {id:'roof',icon:'⬆',label:'비상계단 (옥상)',x:46,y:88,door:true,show:()=>F().shutterDone,open:()=>go('roofstairs')},
-   {id:'down',icon:'⬇',label:'지하로',x:8,y:88,door:true,open:()=>go('security')},
+   {id:'deskpc',icon:'💻',label:'안내데스크 PC',x:38,y:56,glow:true,open:openVisitorLog},
+   {id:'clock',icon:'🕰️',label:'벽시계',x:69,y:21,open:()=>modal('벽시계',`<p>지금 <b class="mono" style="font-size:22px">${gameClock()}</b>.</p><p class="dim">방문자 로그의 업체 도착 예정은 23:30.</p>`)},
+   {id:'sign',icon:'🏢',label:'건물 안내판',x:65,y:43,open:()=>modal('건물 안내판',`<div class="doc"><h4>NEXUS TOWER</h4><p>서울 강남구 테헤란로 <b>71</b></p><table><tr><td>4F</td><td>임원실 · 옥상 통신실 출입</td></tr><tr><td>2~3F</td><td>사무실</td></tr><tr><td>1F</td><td>로비 · 대표실(중층)</td></tr><tr><td>B1</td><td>보안실 · 아카이브</td></tr><tr><td>B2</td><td>서버룸 · 기계실</td></tr></table><p style="font-size:12px;color:#666">지상 4층 / 지하 2층</p></div>`)},
+   {id:'logbook',icon:'📒',label:'근무일지',x:29,y:61,open:()=>modal('안내데스크 근무일지',`<div class="doc"><h4>셔터 운용</h4><p>개방 코드 = <b>오늘 날짜 네 자리</b> 뒤에 <b>당일 방문 예정 인원 수</b>.</p><p style="font-size:12px;color:#666">통제반 키는 대표실 보관.</p></div>`)},
+   {id:'ctrl',icon:'🎛️',label:'통제반',x:70,y:60,open:openControlPanel},
+   {id:'shutter',icon:'🚧',label:'정문 셔터',x:87,y:52,open:()=>modal('정문 셔터',`<p>철제 셔터. 밖에서 가로등 빛이 새어 든다.${F().vanSeen?' 승합차 한 대가 서 있다. 라이트는 꺼졌다.':''}</p>`)},
+   {id:'ceo',icon:'🪜',label:()=>F().ceoOpen?'대표실 (열림)':'대표실 계단',x:9,y:58,door:true,open:()=>F().ceoOpen?go('ceo'):openCeoDoor()},
+   {id:'pantry',icon:'🍱',label:'탕비실',x:54,y:55,door:true,open:()=>go('pantry')},
+   {id:'roof',icon:'⬆',label:'비상계단 (옥상)',x:45,y:44,door:true,show:()=>F().shutterDone,open:()=>go('roofstairs')},
+   {id:'down',icon:'⬇',label:'지하로',x:8,y:90,door:true,open:()=>go('security')},
   ]});
 
 function openVisitorLog(){const first=!F().visitorSeen;F().visitorSeen=true;
@@ -47,10 +47,10 @@ room('ceo',{ch:4,name:'대표실',bg:'ceo',tint:'linear-gradient(180deg,#1a1510,
   hints:['책장이 어지럽혀져 있어. 출판 연도순으로 꽂으면 뭔가 보일 거야.','그림 뒤 금고. 색 다이얼은 책등 순서, 숫자는 장부 코드.'],
   onEnter:()=>{if(!F().ceoSeen){F().ceoSeen=true;say('…여기. 4월 14일에 당신이 들어왔던 방이야. 아니, 김도윤 씨가.');}},
   hots:[
-   {id:'shelf',icon:'📚',label:'책장',x:20,y:45,glow:true,open:openBookshelf},
-   {id:'paint',icon:'🖼️',label:'벽 그림',x:60,y:30,open:openCeoSafe},
-   {id:'desk',icon:'🖊️',label:'책상',x:55,y:65,open:()=>modal('대표 책상',`<p>가족사진 뒷면: "결혼 10주년 — 2022.10.08". 트로피. 서류는 전부 치워져 있다.</p><p class="dim">서랍 안에 명함 한 장. "㈜클린데이터 — 데이터 완전 삭제 전문".</p>`)},
-   {id:'back',icon:'↩',label:'로비로',x:88,y:85,door:true,open:()=>go('lobby')},
+   {id:'shelf',icon:'📚',label:'책장',x:12,y:43,glow:true,open:openBookshelf},
+   {id:'paint',icon:'🖼️',label:'벽 그림',x:84,y:34,open:openCeoSafe},
+   {id:'desk',icon:'🖊️',label:'책상',x:65,y:72,open:()=>modal('대표 책상',`<p>가족사진 뒷면: "결혼 10주년 — 2022.10.08". 트로피. 서류는 전부 치워져 있다.</p><p class="dim">서랍 안에 명함 한 장. "㈜클린데이터 — 데이터 완전 삭제 전문".</p>`)},
+   {id:'back',icon:'↩',label:'로비로',x:35,y:93,door:true,open:()=>go('lobby')},
   ]});
 function openBookshelf(){if(F().sorted){modal('책장',`<p>연도순으로 정리된 책등 색: <b>${BOOKS.map(b=>CN[b.c]).join(' · ')}</b></p>`);return;}
   if(!F().shelfOrder){const o=[0,1,2,3,4,5];for(let i=5;i>0;i--){const j=Math.floor(Math.random()*(i+1));[o[i],o[j]]=[o[j],o[i]];}if(o.every((v,i)=>v===i))[o[0],o[1]]=[o[1],o[0]];F().shelfOrder=o;}
@@ -83,10 +83,10 @@ room('pantry',{ch:4,name:'탕비실',bg:'pantry',tint:'linear-gradient(180deg,#1
   look:'작은 냉장고, 전자레인지, 싱크대. 전자레인지 표시창이 깨져서 지직거린다.',
   hints:['전자레인지 표시창. 내가 거기로 말할 수 있어.'],
   hots:[
-   {id:'fridge',icon:'🧊',label:'냉장고',x:25,y:50,open:()=>modal('냉장고',`<p>도시락 하나. 포스트잇.</p><div class="note">"도윤 씨 거. 안 먹으면 내가 먹음. — 서연"</div><p class="dim">날짜는 4월 14일. 사흘 지났다.</p>`)},
-   {id:'micro',icon:'📟',label:'전자레인지',x:60,y:40,glow:true,open:openMicrowave},
-   {id:'drawer',icon:'🗄️',label:'싱크대 서랍',x:60,y:72,open:()=>{if(!hasInv('테이프')){addInv('테이프');}modal('싱크대 서랍',`<p>일회용 수저, 고무줄, 투명 테이프.</p>`);}},
-   {id:'back',icon:'↩',label:'로비로',x:88,y:85,door:true,open:()=>go('lobby')},
+   {id:'fridge',icon:'🧊',label:'냉장고',x:25,y:65,open:()=>modal('냉장고',`<p>도시락 하나. 포스트잇.</p><div class="note">"도윤 씨 거. 안 먹으면 내가 먹음. — 서연"</div><p class="dim">날짜는 4월 14일. 사흘 지났다.</p>`)},
+   {id:'micro',icon:'📟',label:'전자레인지',x:58,y:43,glow:true,open:openMicrowave},
+   {id:'drawer',icon:'🗄️',label:'싱크대 서랍',x:64,y:70,open:()=>{if(!hasInv('테이프')){addInv('테이프');}modal('싱크대 서랍',`<p>일회용 수저, 고무줄, 투명 테이프.</p>`);}},
+   {id:'back',icon:'↩',label:'로비로',x:8,y:88,door:true,open:()=>go('lobby')},
   ]});
 function openMicrowave(){if(!F().safe2Open){modal('전자레인지',`<p>표시창이 지직거린다. 글자가 될 듯 말 듯.</p>`);return;}
   if(F().usbAsked){modal('전자레인지',`<p>표시창: <b class="mono">${F().usb?'THANK YOU':'OK'}</b></p>`);return;}
