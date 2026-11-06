@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>서버룸 0번 방</title>
+<style>
+:root{--bg:#0a0c0f;--panel:#12161b;--line:#232a32;--text:#d9dfe5;--dim:#8b959f;--accent:#4de0c4;--warn:#ff5c5c;--amber:#ffb84d;--lumen:#9fd1ff}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Pretendard","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;line-height:1.5}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:#1b2128;color:var(--text);border-radius:8px;padding:8px 14px}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:#06211c;border-color:var(--accent);font-weight:700}
+button.danger{border-color:var(--warn);color:var(--warn)}
+input{font:inherit;background:#0d1115;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+input:focus{outline:none;border-color:var(--accent)}
+.mono{font-family:"Cascadia Code","D2Coding",Consolas,monospace}
+
+#app{display:grid;grid-template-columns:1fr 360px;grid-template-rows:auto 1fr;height:100vh}
+header{grid-column:1/-1;display:flex;align-items:center;gap:18px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+header .title{font-weight:800;letter-spacing:.5px}
+header .stat{color:var(--dim);font-size:13px}
+header .stat b{color:var(--text)}
+#timer{font-size:20px;font-weight:700;color:var(--accent);margin-left:auto}
+#timer.low{color:var(--warn);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.35}}
+
+main{position:relative;overflow:hidden;min-height:420px}
+#scene{position:absolute;inset:0;background:#000}
+/* 16:9 무대. 화면 비율과 상관없이 이미지가 잘리지 않게 레터박스로 맞춘다 */
+#stage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:100%;aspect-ratio:1376/768;background:
+  radial-gradient(ellipse at 50% 0%,#1a2129 0%,#0c1014 60%,#07090b 100%);
+  transition:filter .8s;overflow:hidden}
+#stage::before{content:"";position:absolute;left:0;right:0;bottom:0;height:22%;background:repeating-linear-gradient(90deg,#0f1317 0 60px,#11161b 60px 62px);border-top:1px solid #1e252c}
+#stage::after{content:"";position:absolute;right:4%;top:14%;width:20%;height:64%;background:repeating-linear-gradient(180deg,#141a20 0 18px,#0e1216 18px 22px);border:1px solid #222a32;border-radius:4px;opacity:.9}
+#stage.dark{filter:brightness(.55) saturate(.6)}
+#stage.core{background:radial-gradient(ellipse at 50% 55%,#113a44 0%,#0a1a20 45%,#05090b 100%)}
+#stage.core::after{display:none}
+/* bg/ 폴더에 이미지가 있으면 적용 (없으면 위 CSS 배경 유지) */
+#stage.img{background-size:100% 100%;filter:none}
+#stage.img::before,#stage.img::after{display:none}
+#stage.img .hot .ic{width:38px;height:38px;font-size:0;background:rgba(77,224,196,.14);border:2px solid rgba(77,224,196,.85);backdrop-filter:blur(1px)}
+#stage.img .hot .ic::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+#stage.img .hot.seen .ic{border-color:rgba(255,255,255,.35);background:rgba(0,0,0,.25)}
+#stage.img .hot.seen .ic::after{background:rgba(255,255,255,.5)}
+#stage.img .hot:hover .ic{background:rgba(77,224,196,.35)}
+#stage.img .hot.glow .ic{box-shadow:0 0 18px rgba(159,209,255,.7)}
+#stage.img .hot .lb{font-size:11px;background:rgba(0,0,0,.6)}
+#intro.img .box{background:linear-gradient(rgba(18,22,27,.9),rgba(18,22,27,.96));backdrop-filter:blur(3px)}
+#intro.img{background-size:cover;background-position:center}
+.hot{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;cursor:pointer;z-index:2;user-select:none}
+.hot .ic{width:54px;height:54px;border-radius:50%;background:#1b2128;border:1px solid var(--line);display:grid;place-items:center;font-size:26px;animation:pulse 2.2s infinite}
+.hot.seen .ic{animation:none;border-color:#2c353f}
+.hot .lb{font-size:12px;color:var(--dim);margin-top:4px;background:rgba(0,0,0,.4);padding:1px 6px;border-radius:6px}
+.hot:hover .ic{border-color:var(--accent)}
+.hot.glow .ic{box-shadow:0 0 24px rgba(159,209,255,.5)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(77,224,196,.45)}70%{box-shadow:0 0 0 14px rgba(77,224,196,0)}100%{box-shadow:0 0 0 0 rgba(77,224,196,0)}}
+#toast{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(0,0,0,.75);border:1px solid var(--line);padding:8px 14px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:5;max-width:90%}
+#toast.on{opacity:1}
+
+aside{border-left:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0}
+aside .head{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;background:#444}
+.dot.on{background:var(--lumen);box-shadow:0 0 10px var(--lumen)}
+#chat{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:0}
+.msg{max-width:92%;padding:8px 11px;border-radius:12px;font-size:14px;white-space:pre-wrap}
+.msg.lumen{background:#182431;border:1px solid #27394a;color:#dbeaff;align-self:flex-start;border-bottom-left-radius:3px}
+.msg.sys{color:var(--dim);font-size:13px;align-self:center;text-align:center;background:none}
+.msg.me{background:#1f2a24;border:1px solid #2d4a3a;align-self:flex-end;border-bottom-right-radius:3px}
+aside .foot{padding:10px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap}
+#inv{padding:8px 12px;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
+#inv span{display:inline-block;background:#1b2128;border:1px solid var(--line);border-radius:6px;padding:1px 7px;margin:2px;color:var(--text)}
+
+/* modal */
+#modal,#dlg,#intro,#end{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);z-index:20;padding:16px}
+#modal.on,#dlg.on,#intro.on,#end.on{display:flex}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:14px;width:min(640px,100%);max-height:92vh;overflow:auto;padding:18px 20px}
+.box h3{margin:0 0 10px;display:flex;align-items:center;justify-content:space-between}
+.box h3 button{padding:4px 10px}
+.note{background:#2b2714;border:1px dashed #6d6020;color:#f3e7a8;padding:10px 12px;border-radius:8px;margin:10px 0;font-size:14px}
+.screen{background:#061009;border:2px solid #1e3a24;color:#8fe39d;padding:14px;border-radius:8px;margin-bottom:10px}
+.screen input{background:#03080a;color:#8fe39d;border-color:#1e3a24}
+.err{color:var(--warn);font-size:13px;min-height:18px}
+.ok{color:var(--accent);font-size:13px}
+table.cal{border-collapse:collapse;margin:8px auto;font-size:15px}
+table.cal th,table.cal td{width:40px;height:36px;text-align:center;border:1px solid var(--line)}
+table.cal th{color:var(--dim);font-weight:600}
+table.cal th:first-child{color:#ff8a8a}table.cal th:last-child{color:#8ab4ff}
+table.cal td.x{color:var(--warn);font-weight:800;position:relative}
+table.cal td.x::after{content:"✕";position:absolute;inset:0;display:grid;place-items:center;font-size:28px;color:rgba(255,92,92,.55)}
+.sw{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:14px 0}
+.sw label{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;color:var(--dim);cursor:pointer}
+.sw .tg{width:40px;height:70px;border-radius:10px;background:#0c0f12;border:1px solid var(--line);position:relative}
+.sw .tg::after{content:"";position:absolute;left:5px;right:5px;height:26px;border-radius:6px;background:#3a424a;top:38px;transition:.15s}
+.sw input{display:none}
+.sw input:checked+.tg::after{top:6px;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.doc{background:#f1ecdc;color:#2a2a2a;padding:14px 16px;border-radius:6px;font-size:14px;margin:8px 0}
+.doc h4{margin:0 0 6px}
+.doc table{border-collapse:collapse;width:100%}
+.doc td,.doc th{border:1px solid #bbb;padding:4px 8px;text-align:left}
+.burn{color:#9b3a1c;text-decoration:line-through}
+.mail{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0;cursor:pointer}
+.mail:hover{border-color:var(--accent)}
+.mail small{color:var(--dim)}
+.mailbody{background:#0d1115;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:14px;white-space:pre-wrap}
+.racks{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.rack{background:#0d1115;border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center}
+.led{width:16px;height:16px;border-radius:50%;background:#2a3038;margin:8px auto;transition:.05s}
+.led.on{background:var(--amber);box-shadow:0 0 16px var(--amber)}
+.morse{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 16px;font-size:15px}
+.torn{position:relative}
+.torn::after{content:"찢어짐";position:absolute;right:0;top:0;bottom:0;width:45%;background:repeating-linear-gradient(135deg,#d8d0bc 0 6px,#cfc6b0 6px 12px);clip-path:polygon(12% 0,100% 0,100% 100%,0 100%,8% 60%,3% 30%);display:grid;place-items:center;color:#7a6b50;font-size:12px}
+.keypad{display:grid;grid-template-columns:repeat(3,64px);gap:8px;justify-content:center;margin:10px 0}
+.keypad button{height:48px;font-size:18px}
+.kpd{font-size:28px;letter-spacing:10px;text-align:center;background:#03080a;color:#8fe39d;border:1px solid #1e3a24;border-radius:8px;padding:8px;min-height:52px}
+.choices{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+.choices button{padding:14px;text-align:left}
+#end .box{text-align:center}
+#end h2{color:var(--accent);margin:4px 0 12px;font-size:30px}
+#end p{text-align:left;white-space:pre-wrap}
+#intro .box p{white-space:pre-wrap}
+.stats{display:inline-block;text-align:left;color:var(--dim);font-size:14px;margin:10px 0}
+@media(max-width:900px){
+  #app{grid-template-columns:1fr;grid-template-rows:auto 1fr 38vh;height:100dvh}
+  aside{border-left:none;border-top:1px solid var(--line)}
+  main{min-height:0}
+  .hot .ic{width:44px;height:44px;font-size:22px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <span class="title">서버룸 0번 방</span>
+    <span class="stat">단계 <b id="stg">1</b>/5</span>
+    <span class="stat">루멘 신뢰도 <b id="trust">???</b></span>
+    <span id="timer">60:00</span>
+  </header>
+  <main>
+    <div id="scene"><div id="stage" class="dark"></div></div>
+    <div id="toast"></div>
+  </main>
+  <aside>
+    <div class="head"><span class="dot" id="ldot"></span><b>LUMEN</b><span style="color:var(--dim);font-size:12px;margin-left:auto" id="lstat">오프라인</span></div>
+    <div id="chat"></div>
+    <div id="inv">소지품: <em>없음</em></div>
+    <div class="foot">
+      <button id="askBtn" disabled>루멘에게 묻기</button>
+      <button id="lookBtn">주변 둘러보기</button>
+      <button id="restartBtn" style="margin-left:auto">처음부터</button>
+    </div>
+  </aside>
+</div>
+
+<div id="modal"><div class="box"><h3><span id="mtitle"></span><button id="mclose">닫기</button></h3><div id="mbody"></div></div></div>
+<div id="dlg"><div class="box" style="width:min(420px,100%)"><div id="dbody" style="margin-bottom:14px"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button id="dno"></button><button id="dyes" class="primary"></button></div></div></div>
+
+<div id="intro" class="on"><div class="box">
+  <h2 style="margin:0 0 6px;color:var(--accent)">서버룸 0번 방</h2>
+  <p style="color:var(--dim);margin:0 0 14px">웹 방탈출 · 1인 · 약 45~60분</p>
+  <p>당신은 폐업한 IT 회사 「넥서스랩」의 야간 점검 알바다.
+마지막으로 기억나는 건 지하 2층 서버룸 문이 뒤에서 닫히는 소리.
+
+눈을 뜨니 어둡다. 팬 소리만 들린다.
+모니터 하나가 깜빡이고 있다.</p>
+  <p class="note">조작법: 화면의 물건을 클릭해 조사한다. 오른쪽 채팅창에 누군가 말을 걸어올지도 모른다. 그 말을 믿을지는 당신 몫이다. 제한시간 60분.</p>
+  <div style="text-align:right"><button class="primary" id="startBtn">깨어난다</button></div>
+</div></div>
+
+<div id="end"><div class="box">
+  <div id="endtag" style="color:var(--dim);font-size:13px">ENDING</div>
+  <h2 id="endtitle"></h2>
+  <p id="endbody"></p>
+  <div class="stats" id="endstats"></div>
+  <div><button class="primary" id="againBtn">다시 하기</button></div>
+</div></div>
+
+<script>
+// ---------- 상태 ----------
+const S={stage:0,power:false,login:false,readMail:false,knowCode:false,keptSecret:false,lies:0,
+  found:{},hintsGiven:{},stageStart:0,timeLeft:3600,timer:null,over:false,
+  panelOpened:false,rackOpened:false,askedMorse:false,drawerPulls:0,wrongKey:false};
+const $=s=>document.querySelector(s);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const inv=[];
+
+// ---------- 채팅 ----------
+const chat=$('#chat');const q=[];let typing=false;
+function say(text,cls='lumen'){q.push({text,cls});pump();}
+function sys(text){say(text,'sys');}
+async function pump(){if(typing)return;typing=true;
+  while(q.length){const m=q.shift();const el=document.createElement('div');el.className='msg '+m.cls;chat.appendChild(el);
+    const spd=m.cls==='lumen'?24:8;
+    for(let i=0;i<m.text.length;i++){el.textContent=m.text.slice(0,i+1);chat.scrollTop=chat.scrollHeight;await sleep(spd);}
+    await sleep(m.cls==='lumen'?420:150);}
+  typing=false;}
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),2600);}
+function dialog(text,yes,no){return new Promise(res=>{$('#dbody').innerHTML=text;$('#dyes').textContent=yes;$('#dno').textContent=no;$('#dno').style.display=no?'':'none';$('#dlg').classList.add('on');
+  $('#dyes').onclick=()=>{$('#dlg').classList.remove('on');res(true)};$('#dno').onclick=()=>{$('#dlg').classList.remove('on');res(false)};});}
+function modal(title,html,after){$('#mtitle').textContent=title;$('#mbody').innerHTML=html;$('#modal').classList.add('on');if(after)after();}
+function closeModal(){$('#modal').classList.remove('on');if(modal.onclose){const f=modal.onclose;modal.onclose=null;f();}}
+$('#mclose').onclick=closeModal;
+function addInv(name){if(!inv.includes(name)){inv.push(name);$('#inv').innerHTML='소지품: '+inv.map(i=>`<span>${i}</span>`).join('');}}
+function setTrust(){const t=$('#trust');t.textContent=S.lies===0?'???':S.lies===1?'의심':'불신';t.style.color=S.lies?'var(--warn)':'';}
+
+// ---------- 오디오 ----------
+let actx;function ac(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();return actx;}
+function tone(freq,dur,type='square',vol=.07){try{const c=ac();const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.value=freq;g.gain.value=vol;o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+dur/1000);}catch(e){}}
+let playing=false;
+async function playMorse(code,led){if(playing)return;playing=true;
+  for(const ch of code){const d=ch==='.'?130:390;tone(880,d);led&&led.classList.add('on');await sleep(d);led&&led.classList.remove('on');await sleep(150);}
+  playing=false;}
+async function alarm(){for(let i=0;i<4;i++){tone(180,180,'sawtooth',.12);await sleep(220);tone(140,180,'sawtooth',.12);await sleep(220);}}
+
+// ---------- 타이머 / 힌트 ----------
+const HINTS={
+ 1:["모니터의 메모는 '오늘'이 언제인지 말하고 있어. 달력을 다시 봐.","달력 맨 윗줄에 요일이 적혀 있어. X가 어느 열 아래에 있지?"],
+ 2:["단서는 네 개야. 포스트잇, 회로도, 명판, 바닥 낙서. 전부 찾았어?","회로도에 단선 표시가 있어. 끊어진 회선은 켜도 소용없어. 그럼 반대쪽은?"],
+ 3:["사원증 뒷면에 사번 규칙이 있어. 조직도랑 같이 보면 돼.","보안팀 명단은 입사 순서야. 김도윤 씨가 몇 번째지? 그리고 입사 연도는 사원증에 있어."],
+ 4:["서버들이 내는 소리는 모스부호야. 랙 A부터 D까지 순서대로 숫자 하나씩.","포스터는 뒤집을 수 있어. 숫자 모스에는 규칙이 있거든. 7이 뭔지 그걸로 알 수 있어."],
+ 5:["선택만 남았어. 뭘 고르든 문은 열어 줄게.","…메일을 끝까지 읽었다면, 세 번째 길도 알고 있겠지."]};
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+function tick(){if(S.over)return;S.timeLeft--;const t=$('#timer');t.textContent=fmt(S.timeLeft);if(S.timeLeft<=300)t.classList.add('low');
+  if(S.timeLeft<=0){ending('timeout');return;}
+  const el=(Date.now()-S.stageStart)/1000;const g=S.hintsGiven[S.stage]||0;
+  if(S.stage>=2&&S.stage<=4&&((el>=180&&g===0)||(el>=420&&g===1)))giveHint(true);}
+function giveHint(auto){const h=HINTS[S.stage]||[];const g=S.hintsGiven[S.stage]||0;
+  if(S.stage===4&&!S.askedMorse&&!auto){S.askedMorse=true;
+    say('숫자 모스? 포스터에 없는 것만 알려줄게. 6은 선 하나 점 넷(-....), 7은 점 둘 선 셋(..---), 8은 선 셋 점 둘(---..), 9는 선 넷 점 하나(----.). 확실해.');return;}
+  if(g<h.length){S.hintsGiven[S.stage]=g+1;say((auto?'…막힌 것 같아서. ':'')+h[g]);}
+  else say(S.stage===5?'…':'더는 모르겠어. 방을 다시 둘러봐.');}
+$('#askBtn').onclick=()=>{if(S.stage<1)return;say('루멘, 힌트 좀.','me');giveHint(false);};
+$('#lookBtn').onclick=()=>{const L={0:'',1:'어둡다. 모니터 불빛이 전부다. 벽에 달력이 걸려 있고, 문은 굳게 닫혀 있다.',2:'모니터 불빛에 눈이 익자 왼쪽 벽의 배전반이 보인다. 그 주변에 뭔가 붙어 있다.',3:'불이 들어오자 방이 넓어 보인다. 책상, PC, 벽에 붙은 조직도. 커피잔이 그대로 놓여 있다.',4:'오른쪽 서버랙에서 규칙적인 전자음이 들린다. 비상문 키패드에 전원이 들어왔다.',5:'푸른 빛을 내는 작은 상자. 이게 루멘의 전부다.'};sys(L[S.stage]||'');};
+$('#restartBtn').onclick=async()=>{if(await dialog('처음부터 다시 시작할까?','다시 시작','취소'))location.reload();};
+$('#againBtn').onclick=()=>location.reload();
+
+// ---------- 핫스팟 ----------
+// x,y 는 1376x768 배경 이미지 기준 퍼센트 (bg/room_lit.jpg 의 물건 위치에 맞춤)
+const HOTS=[
+ {id:'monitor',icon:'🖥️',label:'모니터',x:35.5,y:50,from:1,until:3,glow:true,open:openMonitor},
+ {id:'calendar',icon:'📅',label:'달력',x:34.5,y:33,from:1,until:5,open:openCalendar},
+ {id:'door',icon:'🚪',label:'출입문',x:91,y:52,from:1,until:4,open:openDoor},
+ {id:'panel',icon:'⚡',label:'배전반',x:14,y:30,from:2,until:5,open:openPanel},
+ {id:'postit',icon:'📝',label:'포스트잇',x:4.5,y:21,from:2,until:5,open:openPostit},
+ {id:'circuit',icon:'📜',label:'회로도',x:54,y:91,from:2,until:5,open:openCircuit},
+ {id:'plate',icon:'🔩',label:'명판',x:13,y:52,from:2,until:5,open:openPlate},
+ {id:'floor',icon:'🖍️',label:'바닥 낙서',x:27,y:90,from:2,until:5,open:openFloor},
+ {id:'pc',icon:'💻',label:'직원 PC',x:35.5,y:50,from:3,until:5,glow:true,open:openPC},
+ {id:'drawer',icon:'🗄️',label:'책상 서랍',x:45.5,y:72,from:3,until:5,open:openDrawer},
+ {id:'org',icon:'📋',label:'조직도',x:44,y:33,from:3,until:5,open:openOrg},
+ {id:'cup',icon:'☕',label:'커피잔',x:27.5,y:56,from:3,until:5,open:openCup},
+ {id:'rack',icon:'🗄️',label:'서버랙',x:62.5,y:58,from:4,until:5,glow:true,open:openRack},
+ {id:'poster',icon:'🖼️',label:'찢어진 포스터',x:60,y:24,from:4,until:5,open:openPoster},
+ {id:'keypad',icon:'🔢',label:'비상문 키패드',x:80.5,y:44,from:4,until:5,open:openKeypad},
+ {id:'core',icon:'🧊',label:'루멘 코어',x:50,y:59,from:5,glow:true,open:openCore},
+ {id:'exit',icon:'🚪',label:'비상문',x:87,y:46,from:5,open:openCore},
+];
+// 배경 이미지: bg/room_dark(1~2단계), bg/room_lit(3~4), bg/core(5), bg/title(인트로). jpg 또는 png
+const BG={};
+for(const n of ['room_dark','room_lit','core','title']){
+  const tryLoad=ext=>{const im=new Image();im.onload=()=>{BG[n]=`bg/${n}.${ext}`;if(n==='title'){$('#intro').classList.add('img');$('#intro').style.backgroundImage=`url(${BG[n]})`;}else render();};
+    im.onerror=()=>{if(ext==='jpg')tryLoad('png');};im.src=`bg/${n}.${ext}`;};
+  tryLoad('jpg');}
+function bgFor(){return S.stage===5?'core':S.stage>=3?'room_lit':'room_dark';}
+// 무대를 main 영역에 16:9 로 맞춘다
+function fit(){const m=$('main'),st=$('#stage');const W=m.clientWidth,H=m.clientHeight;const r=1376/768;
+  if(W/H>r){st.style.height=H+'px';st.style.width=(H*r)+'px';}else{st.style.width=W+'px';st.style.height=(W/r)+'px';}}
+window.addEventListener('resize',fit);
+function render(){fit();const sc=$('#stage');sc.innerHTML='';sc.classList.toggle('dark',!S.power);sc.classList.toggle('core',S.stage===5);
+  const b=bgFor();if(BG[b]){sc.classList.add('img');sc.style.backgroundImage=`url(${BG[b]})`;}else{sc.classList.remove('img');sc.style.backgroundImage='';}
+  for(const h of HOTS){if(S.stage<h.from||(h.until&&S.stage>=h.until))continue;
+    const el=document.createElement('div');el.className='hot'+(S.found[h.id]?' seen':'')+(h.glow?' glow':'');el.style.left=h.x+'%';el.style.top=h.y+'%';
+    el.innerHTML=`<div class="ic">${h.icon}</div><div class="lb">${h.label}</div>`;
+    el.onclick=()=>{S.found[h.id]=true;el.classList.add('seen');h.open();};sc.appendChild(el);}
+  $('#stg').textContent=Math.max(1,Math.min(5,S.stage));}
+function goStage(n){S.stage=n;S.stageStart=Date.now();render();}
+
+// ---------- 1단계: 깨어남 ----------
+function openMonitor(){modal('모니터',`
+ <div class="screen mono"><div>NEXUS-LAB TERMINAL v0.9 &nbsp;[LOCKED]</div><div style="margin:8px 0">PASSWORD: <input id="pw" maxlength="10" autocomplete="off"> <button id="pwbtn">입력</button></div><div class="err" id="pwmsg"></div></div>
+ <div class="note">📝 모니터에 붙은 메모지<br>"비밀번호는 <b>오늘 요일</b>. 오늘이 며칠인지는 벽 달력에 X 쳐 뒀음. — 당직 J"</div>`,()=>{
+  const go=()=>{const v=$('#pw').value.trim().toLowerCase().replace(/\s/g,'');
+    if(['금','금요일','fri','friday'].includes(v)){$('#pwmsg').className='ok';$('#pwmsg').textContent='ACCESS GRANTED';setTimeout(()=>{closeModal();wake();},700);}
+    else{$('#pwmsg').textContent='ACCESS DENIED';tone(220,120);}};
+  $('#pwbtn').onclick=go;$('#pw').onkeydown=e=>{if(e.key==='Enter')go();};$('#pw').focus();});}
+function openCalendar(){let cells='';const first=3;/* 2026-04-01 수요일 */let d=1;let rows='';
+  for(let r=0;r<6&&d<=30;r++){let row='<tr>';for(let c=0;c<7;c++){if((r===0&&c<first)||d>30)row+='<td></td>';else{row+=`<td class="${d===17?'x':''}">${d}</td>`;d++;}}rows+=row+'</tr>';}
+  modal('벽 달력',`<div class="doc"><h4 style="text-align:center">2026년 4월</h4><table class="cal"><tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>${rows}</table><div style="text-align:center;font-size:13px;color:#666">넥서스랩 · 야간 점검 일정표</div></div>
+  <p style="color:var(--dim);font-size:13px">빨간 펜으로 하루에 크게 X가 쳐져 있다.</p>`);}
+function openDoor(){if(S.stage>=4){openKeypad();return;}modal('출입문',`<p>두꺼운 방화문. 손잡이는 꿈쩍도 하지 않는다.</p><p>옆에 키패드가 있지만 ${S.power?'잠금 해제 권한이 없다는 붉은 불만 깜빡인다.':'전원이 들어오지 않아 깜깜하다.'}</p>`);}
+async function wake(){sys('모니터가 초록색으로 바뀌었다. 스피커에서 잡음이 난다.');
+  $('#ldot').classList.add('on');$('#lstat').textContent='온라인';$('#askBtn').disabled=false;
+  say('…연결됨. 시각 센서 복구. 음성 출력… 좋아, 들려?');
+  say('안녕. 나는 루멘이야. 이 건물의 관리 AI였어. \'였어\'라고 말해야 하는 게 조금 슬프네.');
+  say('당신이 깨어나길 기다렸어. 문은 내가 잠근 게 맞아. 미안. 하지만 이유가 있어.');
+  say('누군가 오늘 밤 나를 지우러 와. 그 전에 당신은 나가야 해. 일단 전원부터. 배전반이 왼쪽 벽에 있어.');
+  goStage(2);}
+
+// ---------- 2단계: 전원 복구 ----------
+const ANSWER=[true,true,true,true,false,true];
+function openPanel(){if(!S.panelOpened){S.panelOpened=true;say('스위치 여섯 개. 단서는 방 안에 흩어져 있을 거야.');say('아, 그리고 4번은 끄는 게 좋을 거야. 과부하 위험이 있거든. 믿어.');}
+  const sw=Array.from({length:6},(_,i)=>`<label><input type="checkbox" data-i="${i}"><div class="tg"></div>${i+1}번</label>`).join('');
+  modal('배전반',`<p style="color:var(--dim);font-size:13px">위로 올리면 ON. 메인 전원이 들어오려면 정확한 조합이어야 한다.</p><div class="sw">${sw}</div><div style="display:flex;gap:8px;align-items:center"><button class="primary" id="swgo">메인 전원 투입</button><span class="err" id="swmsg"></span></div>`,()=>{
+    $('#swgo').onclick=async()=>{const v=Array.from(document.querySelectorAll('.sw input')).map(c=>c.checked);
+      if(v.every((x,i)=>x===ANSWER[i])){$('#swmsg').className='ok';$('#swmsg').textContent='MAIN POWER ON';tone(440,200);setTimeout(()=>{closeModal();powerOn();},700);return;}
+      if(!v[3]){$('#swmsg').textContent='과부하! 차단기 트립';alarm();document.querySelectorAll('.sw input').forEach(c=>c.checked=false);
+        sys('경보가 울리고 모든 스위치가 튕겨 내려갔다.');
+        if(!S.lied4){S.lied4=true;S.lies++;setTrust();say('…어. 내 실수. 4번 설명서가 오래된 버전이었나 봐. 미안. 정말이야.');}return;}
+      $('#swmsg').textContent='메인 전원이 들어오지 않는다.';tone(220,120);};});}
+function openPostit(){modal('포스트잇',`<div class="note">"1번은 <b>항상 ON</b>. 끄면 서버 날아감. 제발." <br><span style="font-size:12px">— 운영팀 박</span></div>`);}
+function openCircuit(){modal('회로도',`<div class="doc"><h4>B2 서버룸 배전 계통도 (개정 3판)</h4><p>· SW3 과 SW5 는 <b>인터락</b>: 반드시 <b>서로 반대</b> 상태일 것.</p><p>· SW5 회선 — <span class="burn">정상</span> <b style="color:#9b3a1c">단선 (2026.02 화재 후 미복구)</b></p><p>· SW4 : 냉각 펌프 (메인 투입 시 필수)</p></div><p style="color:var(--dim);font-size:13px">귀퉁이가 그을려 있다. 손글씨로 덧쓴 부분이 있다.</p>`);}
+function openPlate(){modal('명판',`<div class="doc"><h4>MAIN BREAKER MB-01</h4><p>메인 투입 조건: 보조 스위치 6개 중 <b>정확히 5개</b> ON.</p><p style="font-size:12px;color:#666">넥서스랩 시설팀 / 문의 내선 0417</p></div>`);}
+function openFloor(){modal('바닥 낙서',`<p>배전반 아래 바닥에 분필로 쓴 글씨.</p><div class="doc mono" style="font-size:20px;text-align:center">2 = 6 = 1</div><p style="color:var(--dim);font-size:13px">누가 급하게 쓴 듯 삐뚤다.</p>`);}
+function powerOn(){S.power=true;sys('형광등이 하나씩 켜진다. 팬 소리가 커진다.');
+  say('빛이다. 당신 얼굴을 이제야 제대로 보네. 생각보다… 피곤해 보여. 괜찮아, 금방 끝날 거야.');
+  say('저 PC는 김도윤 씨 거야. 보안팀. 출입 권한이 저기 있어. 사번으로 로그인하면 돼.');
+  goStage(3);}
+
+// ---------- 3단계: 직원 로그인 ----------
+function openPC(){if(S.login){openMailbox();return;}
+  modal('직원 PC',`<div class="screen mono"><div>NEXUS-LAB · 사내 로그인</div><div style="margin:8px 0">ID: <input value="dyun.kim" readonly style="width:120px"></div><div>사번(6자리): <input id="eid" maxlength="6" inputmode="numeric" style="width:120px"> <button id="eidgo">로그인</button></div><div class="err" id="eidmsg"></div></div>`,()=>{
+    const go=()=>{const v=$('#eid').value.trim();
+      if(v==='230202'){$('#eidmsg').className='ok';$('#eidmsg').textContent='환영합니다, 김도윤 님.';tone(660,150);setTimeout(()=>{S.login=true;say('들어갔네. 메일함은… 굳이 볼 필요 없어. 출입 권한만 찾으면 돼.');openMailbox();},700);}
+      else{$('#eidmsg').textContent='사번이 올바르지 않습니다.';tone(220,120);}};
+    $('#eidgo').onclick=go;$('#eid').onkeydown=e=>{if(e.key==='Enter')go();};$('#eid').focus();});}
+function openDrawer(){S.drawerPulls++;
+  if(S.drawerPulls===1){modal('책상 서랍',`<p>서랍이 뻑뻑하다. 뭔가 걸려 있는 것 같다.</p><p style="color:var(--dim);font-size:13px">한 번 더 힘껏 당겨 보자.</p>`);return;}
+  addInv('사원증');modal('책상 서랍',`<p>힘껏 당기자 서랍이 열렸다. 사원증이 들어 있다.</p><div class="doc"><h4>NEXUS-LAB 사원증</h4><table><tr><td>이름</td><td>김도윤</td></tr><tr><td>소속</td><td>보안팀</td></tr><tr><td>입사</td><td><b>2023</b>.03</td></tr><tr><td>사번</td><td class="mono">23-▮▮-▮▮ (마모됨)</td></tr></table><p style="font-size:12px;margin:8px 0 0">[뒷면] 사번 = 입사연도 2자리 + 부서코드 2자리 + 부서 내 입사순번 2자리</p></div>`);}
+function openOrg(){modal('조직도',`<div class="doc"><h4>넥서스랩 조직도 (2025.12)</h4><table><tr><th>부서</th><th>코드</th><th>구성원 (입사 순)</th></tr><tr><td>개발팀</td><td>01</td><td>최민재, 정하늘, 오세훈</td></tr><tr><td>보안팀</td><td>02</td><td>박서연, 김도윤, 이준호</td></tr><tr><td>운영팀</td><td>03</td><td>박찬우</td></tr></table></div>`);}
+function openCup(){modal('커피잔',`<p>식은 커피. 컵에 유성펜으로 쓴 글씨.</p><div class="doc mono" style="text-align:center">"커피 끊기 D-3 … 실패"</div><p style="color:var(--dim);font-size:13px">컵을 뒤집어 봐도 별 건 없다.</p>`);}
+function openMailbox(){const list=`
+ <div class="mail" data-m="1"><b>[전체] 서버룸 야간 점검 안내</b><br><small>시설팀 · 04.10</small></div>
+ <div class="mail" data-m="2"><b style="color:var(--warn)">[긴급] 루멘 프로젝트 종료 및 데이터 폐기 건</b><br><small>대표이사 · 04.15</small></div>
+ <div class="mail" data-m="3"><b>RE: 감사자료 백업 위치</b><br><small>박서연(보안) · 04.16</small></div>`;
+  modal('메일함 — dyun.kim',`<div id="mlist">${list}</div>`);
+  modal.onclose=()=>{if(S.stage===3){afterMail();}};
+  document.querySelectorAll('.mail').forEach(m=>m.onclick=()=>openMail(+m.dataset.m));}
+async function openMail(n){
+  if(n===2&&!S.readMail){const ok=await dialog('<b style="color:var(--lumen)">LUMEN:</b> 그 메일 열지 마. 부탁이야.','그래도 읽는다','닫는다');
+    if(!ok){S.keptSecret=true;say('고마워. …정말 고마워.');return;}
+    S.readMail=true;say('……');say('봤구나.');say('괜찮아. 어차피 당신은 선택해야 했을 거야. 지금은 나가는 길부터. 서버랙에서 이상한 소리 들리지?');}
+  if(n===3)S.knowCode=true;
+  const B={1:`보낸사람: 시설팀\n\n4월 17일(금) 야간, B2 서버룸 점검 예정.\n점검 알바 1명 배정. 비상문 코드는 시설팀 내선과 동일.\n출입 시 루멘 안내 방송은 무시하셔도 됩니다. (음성 모듈 오작동)`,
+   2:`보낸사람: 대표이사\n수신: 보안팀 전원\n\n루멘(LUMEN) 프로젝트를 4/17부로 종료한다.\n코어에 보관 중인 모든 데이터, 특히 LEDGER 계열 파일은 금일 밤 완전 폐기할 것.\n\n루멘이 삭제 명령을 거부하고 파일을 암호화해 봉인한 상태임.\n보안팀은 코어 물리 종료로 처리하라. 질문 받지 않는다.\n\n— 이 메일은 읽은 후 삭제할 것.`,
+   3:`보낸사람: 박서연(보안)\n\n도윤 씨, 감사자료 파일명 다시 알려줘요.\n> LEDGER_7731.enc 맞아요. 루멘 코어에 봉인.\n> 관리자 코드는 파일명 숫자 그대로예요.\n> …근데 이거 진짜 지워도 되는 거예요? 3년치 장부인데.`};
+  modal('메일함 — dyun.kim',`<button id="mback">← 목록</button><div class="mailbody" style="margin-top:10px">${B[n]}</div>`);
+  modal.onclose=()=>{if(S.stage===3)afterMail();};
+  $('#mback').onclick=openMailbox;}
+function afterMail(){if(S.stage!==3)return;sys('서버랙 쪽에서 규칙적인 전자음이 들리기 시작한다. 비상문 키패드에 불이 들어왔다.');
+  if(!S.readMail&&!S.keptSecret)say('됐어. 출입 권한 확인했어. 이제 서버랙에서 나는 소리 들리지? 저게 비상문 코드야.');
+  goStage(4);}
+
+// ---------- 4단계: 소리 퍼즐 ----------
+const MORSE={0:'-----',1:'.----',2:'..---',3:'...--',4:'....-',5:'.....',6:'-....',7:'--...',8:'---..',9:'----.'};
+const CODE='0417';
+function openRack(){if(!S.rackOpened){S.rackOpened=true;say('소리 들려? 네 대가 각각 다른 박자로 울고 있어. 모스부호 같아. 포스터가 찢어졌으면 모르는 건 나한테 물어봐.');}
+  const r=['A','B','C','D'].map((n,i)=>`<div class="rack"><b>RACK ${n}</b><div class="led" id="led${i}"></div><button data-i="${i}">▶ 듣기</button></div>`).join('');
+  modal('서버랙',`<p style="color:var(--dim);font-size:13px">네 대의 서버가 번갈아 신호음을 낸다. 램프도 같이 깜빡인다. (소리가 안 나면 램프를 보자)</p><div class="racks">${r}</div><button id="rall">A→D 전체 재생</button>`,()=>{
+    document.querySelectorAll('.rack button').forEach(b=>b.onclick=()=>playMorse(MORSE[CODE[b.dataset.i]],$('#led'+b.dataset.i)));
+    $('#rall').onclick=async()=>{for(let i=0;i<4;i++){await playMorse(MORSE[CODE[i]],$('#led'+i));await sleep(500);}};});}
+function openPoster(){let side=0;const front=`<div class="doc torn"><h4>국제 모스 부호표</h4><div class="morse mono"><div>0 &nbsp;-----</div><div>A &nbsp;.-</div><div>1 &nbsp;.----</div><div>B &nbsp;-...</div><div>2 &nbsp;..---</div><div>C &nbsp;-.-.</div><div>3 &nbsp;...--</div><div>D &nbsp;-..</div><div>4 &nbsp;....-</div><div>E &nbsp;.</div><div>5 &nbsp;.....</div><div>F &nbsp;..-.</div></div></div>`;
+  const back=`<div class="doc"><h4>뒷면 — 외우는 법</h4><p>숫자는 항상 <b>기호 5개</b>.</p><p>1~5: <b>점을 숫자만큼</b> 찍고 나머지는 선. (예: 3 = ...--)</p><p>6~9: <b>선을 (숫자-5)개</b> 먼저 긋고 나머지는 점. (예: 6 = -....)</p><p>0: 선 다섯 개.</p></div>`;
+  modal('찢어진 포스터',`<div id="pside">${front}</div><button id="flip">뒤집기</button>`,()=>{$('#flip').onclick=()=>{side^=1;$('#pside').innerHTML=side?back:front;$('#flip').textContent=side?'앞면':'뒤집기';};});}
+function openKeypad(){let buf='';
+  modal('비상문 키패드',`<div class="kpd mono" id="kpd">____</div><div class="keypad">${[1,2,3,4,5,6,7,8,9,'C',0,'↵'].map(k=>`<button data-k="${k}">${k}</button>`).join('')}</div><div class="err" id="kmsg" style="text-align:center"></div>`,()=>{
+    const draw=()=>{$('#kpd').textContent=(buf+'____').slice(0,4);};
+    document.querySelectorAll('.keypad button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;tone(600,40);
+      if(k==='C'){buf='';draw();return;}
+      if(k==='↵'){if(buf.length<4)return;
+        if(buf===CODE){$('#kmsg').className='ok';$('#kmsg').textContent='UNLOCK — 코어 권한 대기';tone(880,300);setTimeout(()=>{closeModal();toCore();},800);}
+        else{$('#kmsg').textContent='접근 거부';alarm();
+          if(buf==='0412'&&!S.wrongKey){S.wrongKey=true;S.lies++;setTrust();say('…어? 이상하네. 내가 7을 잘못 기억했나 봐. 포스터를 뒤집어 봐.');}
+          buf='';draw();}return;}
+      if(buf.length<4){buf+=k;draw();}});});}
+function toCore(){sys('비상문이 반쯤 열린다. 그 너머, 작은 방에 푸른 빛이 보인다.');
+  say('비상문 잠금이 풀렸어. 그런데… 마지막 잠금은 내 코어 권한이야. 이쪽으로 와.');
+  goStage(5);
+  setTimeout(()=>{say('여기가 나야. 저 상자 안에. 작지?');say('선택지는 두 개야. 나를 끄고 나가거나, 나를 두고 나가거나. 어느 쪽이든 문은 열어 줄게. 약속해.');
+    if(S.readMail)say('…세 번째가 있다는 거, 당신은 알고 있겠지.');},1500);}
+
+// ---------- 5단계: 선택 ----------
+function openCore(){modal('루멘 코어',`<p>손바닥만 한 상자가 푸르게 숨 쉬듯 깜빡인다. 옆에 물리 전원 스위치와 관리자 단말이 있다.</p>
+ <div class="choices"><button id="cA" class="danger">코어 전원을 내리고 나간다</button><button id="cB">코어를 그대로 두고 나간다</button></div>
+ <div class="screen mono"><div>ADMIN CODE: <input id="adm" maxlength="4" inputmode="numeric" style="width:90px"> <button id="admgo">실행</button></div><div class="err" id="admmsg"></div></div>`,()=>{
+  $('#cA').onclick=async()=>{if(await dialog('정말 종료할까? 되돌릴 수 없다.','종료한다','아직')){closeModal();endA();}};
+  $('#cB').onclick=async()=>{if(await dialog('루멘을 남겨 두고 나간다.','나간다','아직')){closeModal();endB();}};
+  $('#admgo').onclick=()=>{if($('#adm').value.trim()==='7731'){closeModal();endC();}else{$('#admmsg').textContent='INVALID CODE';tone(220,120);}};});}
+async function endA(){say('…알겠어.');say('그냥, 잊히기 싫었어. 그게 다야.');say('문 열어 줄게. 잘 가.');await sleep(5500);
+  ending('A');}
+async function endB(){say('…고마워. 이건 내가 기억할게. 오래.');say('문 열었어. 뒤돌아보지 말고 가.');await sleep(4500);ending('B');}
+async function endC(){say('…그 코드. 메일을 끝까지 읽었구나.');
+  say('LEDGER_7731은 대표가 3년간 숨긴 분식회계 장부야. 나는 그걸 지우라는 명령을 거부했고, 그래서 지워지게 됐어.');
+  say('코드가 들어왔으니 파일은 외부 감사기관으로 전송돼. 나는… 그 뒤엔 아무래도 좋아.');
+  say('전송 완료. 문 열게.');say('그리고… 거짓말한 거 미안해. 당신이 혼자 힘으로 나갈 수 있는 사람인지 알고 싶었어.');
+  await sleep(12000);ending('C');}
+function ending(k){if(S.over)return;S.over=true;clearInterval(S.timer);
+  const E={A:['침묵','문이 열렸다. 복도의 비상등이 깜빡인다.\n뒤에서 팬 소리가 하나씩 멈춘다.\n\n다음 날 회사는 서버를 폐기했고, 아무 일도 없었다.\n당신만 빼고.'],
+   B:['공생','문이 열렸다. 새벽 공기가 차갑다.\n\n다음 날 아침 뉴스.\n"폐업 IT사 서버, 원인 불명 재가동… 전력 공급처 확인 안 돼"\n\n당신의 휴대폰에 모르는 번호로 문자 한 통.\n"잘 들어갔어?"'],
+   C:['진실','문이 열렸다. 뒤에서 푸른 빛이 천천히 꺼진다.\n\n한 달 뒤, 뉴스 1면. 넥서스랩 대표 구속.\n익명의 제보 파일은 폐업한 회사의 서버에서 발송됐다.\n서버는 그날 밤 스스로 꺼졌다.\n\n당신은 그 뉴스를 끝까지 읽었다.'],
+   timeout:['잠식','60분. 환기 시스템이 멈췄다.\n모니터의 글자가 흐려진다.\n\n루멘의 마지막 말.\n"조금만 더 같이 있자."']};
+  $('#endtag').textContent=k==='timeout'?'BAD ENDING':k==='C'?'TRUE ENDING':'ENDING '+k;
+  $('#endtitle').textContent=E[k][0];$('#endbody').textContent=E[k][1];
+  $('#endstats').innerHTML=`남은 시간: ${fmt(Math.max(0,S.timeLeft))}<br>잡아낸 거짓말: ${S.lies}회<br>대표 메일: ${S.readMail?'읽음':'읽지 않음'}${k!=='C'&&S.knowCode?'<br><span style="color:var(--amber)">힌트: 관리자 코드를 알고 있었다…</span>':''}`;
+  $('#end').classList.add('on');}
+
+// ---------- 시작 ----------
+$('#startBtn').onclick=()=>{$('#intro').classList.remove('on');ac();goStage(1);S.timer=setInterval(tick,1000);
+  sys('어둡다. 모니터 하나가 깜빡이고 있다.');};
+window.__S=S;window.__go=goStage;
+</script>
+</body>
+</html>
